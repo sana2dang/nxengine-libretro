@@ -130,7 +130,7 @@ void NXFont::free()
 			FreeSurface(letters[i]);
 		letters[i] = NULL;
 	}
-	for(int i=0;i<NUM_KR_LETTERS_RENDERED;i++)	// added kr letters
+	for(int i=0;i<NUM_KR_LETTERS_RENDERED;i++)	// added kr + symbol letters
 	{
 		if (krletters[i])
 			FreeSurface(krletters[i]);
@@ -399,7 +399,38 @@ static int text_draw(int x, int y, const char *text, int spacing, NXFont *font)
 	{
 		char ch = text[i];
 		char ch2 = text[i+1];
-		if (ch >= 0xB0 && ch <= 0xC8 && ch2 >= 0xA1 && ch2 <= 0xFE) // KSC5601 : 0xB0A1 ~ 0xC8FE (except xxA0, xxFF)
+		if (ch >= 0xA1 && ch <= 0xA2 && ch2 >= 0xA1 && ch2 <= 0xFE) // Symbol(166)  : 0xA1A1 ~ 0xA2E8 (except xxA0, xxFF)
+		{
+			unsigned short krch = ((unsigned short)ch - 0xA1) * 94 + (ch2 - 0xA1) + 2350;
+			SDL_Surface *krletter = font->krletters[krch];
+
+			if (rendering && krletter)
+			{
+				// must set this every time, because SDL_BlitSurface overwrites
+				// dstrect with final clipping rectangle.
+				dstrect.x = x;
+				dstrect.y = y;
+				DrawBlit(krletter, NULL, sdl_screen, &dstrect);
+			}
+
+			if (krletter) 
+			{
+				if (krletter->w < spacing * 2)
+				{	// fixed spacing
+					x += spacing * 2;
+				}
+				else
+				{
+					x += krletter->w;
+				}
+				i++;
+			} 
+			else if (spacing != 0)
+			{
+				x += spacing;
+			}
+		}
+		else if (ch >= 0xB0 && ch <= 0xC8 && ch2 >= 0xA1 && ch2 <= 0xFE) // Hangul(2350) : 0xB0A1 ~ 0xC8FE (except xxA0, xxFF)
 		{
 			unsigned short krch = ((unsigned short)ch - 0xB0) * 94 + (ch2 - 0xA1);
 			SDL_Surface *krletter = font->krletters[krch];

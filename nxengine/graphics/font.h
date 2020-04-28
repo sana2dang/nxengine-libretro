@@ -6,8 +6,8 @@
 #define NUM_LETTERS_RENDERED	256 // Allow usage of the other half of the font, containing the diacritics
 #define FONT_DEFAULT_SPACING	5
 
-#define NUM_FONT_KR_LETTERS		2350
-#define NUM_KR_LETTERS_RENDERED	2350
+#define NUM_FONT_KR_LETTERS		2516	// hangul(2350) + symbol(166)
+#define NUM_KR_LETTERS_RENDERED	2516	
 
 class NXFont
 {
